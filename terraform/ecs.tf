@@ -8,7 +8,8 @@ resource "aws_ecs_task_definition" "this" {
   network_mode             = "awsvpc"
   cpu                      = "512"
   memory                   = "1024"
-  execution_role_arn       = "arn:aws:iam::578478003593:role/ecsTaskExecutionRole"
+  execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
+  task_role_arn      = aws_iam_role.ecs_task_execution_role.arn
 
   container_definitions = jsonencode([
     {
@@ -17,6 +18,7 @@ resource "aws_ecs_task_definition" "this" {
       essential = true
       portMappings = [{
         containerPort = 1337
+        protocol      = "tcp"
       }]
       environment = [
         { name = "DATABASE_HOST", value = var.db_host },
