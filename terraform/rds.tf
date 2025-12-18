@@ -1,5 +1,5 @@
 resource "aws_db_subnet_group" "strapi" {
-  name       = "strapi-db-subnet-group"
+  name       = "strapi-db-subnet-group-v2"
   subnet_ids = data.aws_subnets.default.ids
 
   tags = {
@@ -8,7 +8,7 @@ resource "aws_db_subnet_group" "strapi" {
 }
 
 resource "aws_security_group" "rds" {
-  name   = "strapi-rds-sg"
+  name   = "strapi-rds-sg-v2"
   vpc_id = data.aws_vpc.default.id
 
   ingress {
