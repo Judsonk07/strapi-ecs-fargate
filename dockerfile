@@ -1,23 +1,25 @@
 FROM node:20-alpine
 
-# Set environment
-ENV NODE_ENV=production
-
-# Create app directory
 WORKDIR /app
 
-# Install dependencies
+# Copy package files
 COPY package*.json ./
-RUN npm install --production
 
-# Copy application code
+# Install ALL dependencies (required for build)
+RUN npm install
+
+# Copy app source
 COPY . .
 
-# Build Strapi admin panel
+# Build Strapi admin (REQUIRED)
 RUN npm run build
 
-# Expose Strapi port
+# Runtime env
+ENV NODE_ENV=production
+ENV HOST=0.0.0.0
+ENV PORT=1337
+
 EXPOSE 1337
 
 # Start Strapi
-CMD ["npm", "run", "start"]
+CMD ["npm", "start"]
