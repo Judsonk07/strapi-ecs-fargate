@@ -7,9 +7,9 @@ variable "image_url" {
   type = string
 }
 
-variable "db_host" {
-  type = string
-}
+# variable "db_host" {
+#   type = string
+# }
 
 variable "db_name" {
   type    = string
