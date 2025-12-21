@@ -1,4 +1,4 @@
-resource "aws_iam_role" "ecs_task_execution_role" {
+data "aws_iam_role" "ecs_task_execution_role" {
   name = "ecsTaskExecutionRole"
 
   assume_role_policy = jsonencode({
