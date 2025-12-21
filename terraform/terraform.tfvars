@@ -1,0 +1,14 @@
+
+# app_keys = "changeme,changeme"
+# api_token_salt = "changeme"
+# admin_jwt_secret = "changeme"
+# transfer_token_salt = "changeme"
+# encryption_key = "changeme"
+
+
+app_keys="gic/fVUC56QogygkLhAvyA==,uqUsnTf6/5f2rn69M5m/nA==,xKYXb5D/uBo8Ao1Fuu2AOg==,fjAOqRL3sNoPPwwmGZjbxQ=="
+api_token_salt="Qew12hM1eRXBkdyJPvMaSA=="
+admin_jwt_secret="6p8NqtxvXL9GDilJg5gSwg=="
+transfer_token_salt="iNeB/ACexQ7mpRTYKo1DCQ=="
+encryption_key="4nvRc4N3c2pVzU/fK4DhhQ=="   
+jwt_secret="JL6jyO/mIanbFrIYQPZLRg=="

@@ -21,18 +21,43 @@ resource "aws_ecs_task_definition" "this" {
         containerPort = 1337
         protocol      = "tcp"
       }]
+
+      logConfiguration = {
+      logDriver = "awslogs"
+      options = {
+        awslogs-group         = aws_cloudwatch_log_group.strapi.name
+        awslogs-region        = var.aws_region
+        awslogs-stream-prefix = "ecs"
+      }
+    }
       
       environment = [
         { name = "HOST", value = "0.0.0.0" },
         { name = "PORT", value = "1337" },
 
         { name = "DATABASE_CLIENT", value = "postgres" },
-        { name = "DATABASE_HOST", value = aws_db_instance.strapi_db.address },
+        { name = "DATABASE_HOST", value = aws_db_instance.strapi.address },
         { name = "DATABASE_PORT", value = "5432" },
         { name = "DATABASE_NAME", value = var.db_name },
-        { name = "DATABASE_USERNAME", value = var.db_user },
-        { name = "DATABASE_PASSWORD", value = var.db_password }
+        { name = "DATABASE_USERNAME", value = var.db_user},
+        { name = "DATABASE_PASSWORD", value = var.db_password },
+        { name = "DATABASE_SSL", value = "false" },
+
+        { name = "APP_KEYS", value = var.app_keys },
+        { name = "API_TOKEN_SALT", value = var.api_token_salt },
+        { name = "ADMIN_JWT_SECRET", value = var.admin_jwt_secret },
+        { name = "TRANSFER_TOKEN_SALT", value = var.transfer_token_salt },
+        { name = "ENCRYPTION_KEY", value = var.encryption_key },
+        { name = "JWT_SECRET", value = var.jwt_secret }
       ]
+
+      # secrets = [
+      #   { name = "APP_KEYS", valueFrom = "${aws_secretsmanager_secret.strapi.arn}:APP_KEYS::" },
+      #   { name = "API_TOKEN_SALT", valueFrom = "${aws_secretsmanager_secret.strapi.arn}:API_TOKEN_SALT::" },
+      #   { name = "ADMIN_JWT_SECRET", valueFrom = "${aws_secretsmanager_secret.strapi.arn}:ADMIN_JWT_SECRET::" },
+      #   { name = "TRANSFER_TOKEN_SALT", valueFrom = "${aws_secretsmanager_secret.strapi.arn}:TRANSFER_TOKEN_SALT::" },
+      #   { name = "ENCRYPTION_KEY", valueFrom = "${aws_secretsmanager_secret.strapi.arn}:ENCRYPTION_KEY::" }
+      # ]
     }
   ])
 }

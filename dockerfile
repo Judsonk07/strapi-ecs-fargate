@@ -6,7 +6,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install ALL dependencies (required for build)
-RUN npm install
+RUN npm install --production
 
 # Copy app source
 COPY . .
@@ -22,4 +22,4 @@ ENV PORT=1337
 EXPOSE 1337
 
 # Start Strapi
-CMD ["npm", "start"]
+CMD ["npm", "run" , "start"]
