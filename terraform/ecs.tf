@@ -36,7 +36,7 @@ resource "aws_ecs_task_definition" "this" {
         { name = "PORT", value = "1337" },
 
         { name = "DATABASE_CLIENT", value = "postgres" },
-        { name = "DATABASE_HOST", value = aws_db_instance.strapi.address },
+        { name = "DATABASE_HOST", value = aws_db_instance.strapi_db.address },
         { name = "DATABASE_PORT", value = "5432" },
         { name = "DATABASE_NAME", value = var.db_name },
         { name = "DATABASE_USERNAME", value = var.db_user},

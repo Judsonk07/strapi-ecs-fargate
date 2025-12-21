@@ -27,8 +27,8 @@ resource "aws_cloudwatch_metric_alarm" "strapi_cpu_high" {
   threshold           = 80
 
   dimensions = {
-    ClusterName = aws_ecs_cluster.strapi.name
-    ServiceName = aws_ecs_service.strapi.name
+    ClusterName = aws_ecs_cluster.this.name
+    ServiceName = aws_ecs_service.this.name
   }
 
   alarm_description = "High CPU usage on Strapi ECS service"
@@ -49,15 +49,15 @@ resource "aws_cloudwatch_metric_alarm" "strapi_memory_high" {
   threshold           = 80
 
   dimensions = {
-    ClusterName = aws_ecs_cluster.strapi.name
-    ServiceName = aws_ecs_service.strapi.name
+    ClusterName = aws_ecs_cluster.this.name
+    ServiceName = aws_ecs_service.this.name
   }
 
   alarm_description = "High memory usage on Strapi ECS service"
 }
 
 ########################################
-# ECS Task Down Alarm (Critical)
+# ECS Task Down Alarm
 ########################################
 
 resource "aws_cloudwatch_metric_alarm" "strapi_task_down" {
@@ -71,8 +71,8 @@ resource "aws_cloudwatch_metric_alarm" "strapi_task_down" {
   threshold           = 1
 
   dimensions = {
-    ClusterName = aws_ecs_cluster.strapi.name
-    ServiceName = aws_ecs_service.strapi.name
+    ClusterName = aws_ecs_cluster.this.name
+    ServiceName = aws_ecs_service.this.name
   }
 
   alarm_description = "Strapi ECS task is not running"
@@ -93,7 +93,7 @@ resource "aws_cloudwatch_metric_alarm" "alb_latency_high" {
   threshold           = 2
 
   dimensions = {
-    LoadBalancer = aws_lb.strapi.arn_suffix
+    LoadBalancer = aws_lb.this.arn_suffix
   }
 
   alarm_description = "High response latency on Strapi ALB"
@@ -114,8 +114,8 @@ resource "aws_cloudwatch_metric_alarm" "alb_unhealthy_targets" {
   threshold           = 0
 
   dimensions = {
-    LoadBalancer = aws_lb.strapi.arn_suffix
-    TargetGroup  = aws_lb_target_group.strapi.arn_suffix
+    LoadBalancer = aws_lb.this.arn_suffix
+    TargetGroup  = aws_lb_target_group.this.arn_suffix
   }
 
   alarm_description = "Strapi ALB target is unhealthy"
@@ -136,8 +136,8 @@ resource "aws_cloudwatch_dashboard" "strapi_dashboard" {
         height = 6
         properties = {
           metrics = [
-            ["AWS/ECS", "CPUUtilization", "ClusterName", aws_ecs_cluster.strapi.name, "ServiceName", aws_ecs_service.strapi.name],
-            ["AWS/ECS", "MemoryUtilization", "ClusterName", aws_ecs_cluster.strapi.name, "ServiceName", aws_ecs_service.strapi.name]
+            ["AWS/ECS", "CPUUtilization", "ClusterName", aws_ecs_cluster.this.name, "ServiceName", aws_ecs_service.this.name],
+            ["AWS/ECS", "MemoryUtilization", "ClusterName", aws_ecs_cluster.this.name, "ServiceName", aws_ecs_service.this.name]
           ]
           period = 60
           stat   = "Average"
@@ -151,7 +151,7 @@ resource "aws_cloudwatch_dashboard" "strapi_dashboard" {
         height = 6
         properties = {
           metrics = [
-            ["AWS/ECS", "RunningTaskCount", "ClusterName", aws_ecs_cluster.strapi.name, "ServiceName", aws_ecs_service.strapi.name]
+            ["AWS/ECS", "RunningTaskCount", "ClusterName", aws_ecs_cluster.this.name, "ServiceName", aws_ecs_service.this.name]
           ]
           period = 60
           stat   = "Average"
@@ -165,7 +165,7 @@ resource "aws_cloudwatch_dashboard" "strapi_dashboard" {
         height = 6
         properties = {
           metrics = [
-            ["AWS/ApplicationELB", "TargetResponseTime", "LoadBalancer", aws_lb.strapi.arn_suffix]
+            ["AWS/ApplicationELB", "TargetResponseTime", "LoadBalancer", aws_lb.this.arn_suffix]
           ]
           period = 60
           stat   = "Average"
