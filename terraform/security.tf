@@ -52,7 +52,7 @@ resource "aws_security_group" "alb" {
 #####################################
 
 resource "aws_security_group" "strapi" {
-  name   = "strapi-ecs-sg"
+  name   = "strapi-ecs-sg-1"
   vpc_id = data.aws_vpc.default.id
 
   ingress {
