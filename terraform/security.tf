@@ -75,7 +75,7 @@ resource "aws_security_group" "strapi" {
 #####################################
 
 resource "aws_security_group" "rds" {
-  name   = "strapi-rds-sg"
+  name   = "strapi-rds-sg-1"
   vpc_id = data.aws_vpc.default.id
 
   ingress {
