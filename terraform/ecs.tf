@@ -2,14 +2,29 @@ resource "aws_ecs_cluster" "this" {
   name = "strapi-cluster"
 }
 
+resource "aws_ecs_cluster_capacity_providers" "this" {
+  cluster_name = aws_ecs_cluster.this.name
+
+  capacity_providers = [
+    "FARGATE",
+    "FARGATE_SPOT"
+  ]
+
+  default_capacity_provider_strategy {
+    capacity_provider = "FARGATE_SPOT"
+    weight            = 1
+  }
+}
+
+
 resource "aws_ecs_task_definition" "this" {
   family                   = "strapi-task"
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
   cpu                      = "512"
   memory                   = "1024"
-  execution_role_arn = data.aws_iam_role.ecs_task_execution_role.arn
-  task_role_arn      = data.aws_iam_role.ecs_task_execution_role.arn
+  execution_role_arn       = data.aws_iam_role.ecs_task_execution_role.arn
+  task_role_arn            = data.aws_iam_role.ecs_task_execution_role.arn
 
 
   container_definitions = jsonencode([
@@ -24,14 +39,14 @@ resource "aws_ecs_task_definition" "this" {
       }]
 
       logConfiguration = {
-      logDriver = "awslogs"
-      options = {
-        awslogs-group         = aws_cloudwatch_log_group.strapi.name
-        awslogs-region        = var.aws_region
-        awslogs-stream-prefix = "ecs"
+        logDriver = "awslogs"
+        options = {
+          awslogs-group         = aws_cloudwatch_log_group.strapi.name
+          awslogs-region        = var.aws_region
+          awslogs-stream-prefix = "ecs"
+        }
       }
-    }
-      
+
       environment = [
         { name = "HOST", value = "0.0.0.0" },
         { name = "PORT", value = "1337" },
@@ -40,7 +55,7 @@ resource "aws_ecs_task_definition" "this" {
         { name = "DATABASE_HOST", value = aws_db_instance.strapi_db.address },
         { name = "DATABASE_PORT", value = "5432" },
         { name = "DATABASE_NAME", value = var.db_name },
-        { name = "DATABASE_USERNAME", value = var.db_user},
+        { name = "DATABASE_USERNAME", value = var.db_user },
         { name = "DATABASE_PASSWORD", value = var.db_password },
         { name = "DATABASE_SSL", value = "false" },
 
@@ -68,7 +83,11 @@ resource "aws_ecs_service" "this" {
   cluster         = aws_ecs_cluster.this.id
   task_definition = aws_ecs_task_definition.this.arn
   desired_count   = 1
-  launch_type     = "FARGATE"
+
+  capacity_provider_strategy {
+    capacity_provider = "FARGATE_SPOT"
+    weight            = 1
+  }
 
   network_configuration {
     subnets          = data.aws_subnets.default.ids
@@ -82,5 +101,5 @@ resource "aws_ecs_service" "this" {
     container_port   = 1337
   }
 
-  depends_on = [aws_lb_listener.this]
+  depends_on = [aws_lb_listener.this, aws_ecs_cluster_capacity_providers.this]
 }

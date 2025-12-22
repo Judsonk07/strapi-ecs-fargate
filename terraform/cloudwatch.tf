@@ -126,7 +126,7 @@ resource "aws_cloudwatch_metric_alarm" "alb_unhealthy_targets" {
 ########################################
 
 resource "aws_cloudwatch_dashboard" "strapi_dashboard" {
-  dashboard_name = "strapi-ecs-alb-dashboard"
+  dashboard_name = "judson-strapi-ecs-alb-dashboard"
 
   dashboard_body = jsonencode({
     widgets = [
