@@ -42,13 +42,7 @@ jobs:
           TF_VAR_db_password: ${{ secrets.DB_PASSWORD }}
           TF_VAR_db_user: ${{ secrets.DB_USER }}
           TF_VAR_db_name: ${{ secrets.DB_NAME }}
-          # TF_VAR_image_url: ${{ secrets.IMAGE_URL }}
-          # TF_VAR_app_keys: ${{ secrets.APP_KEYS }}
-          # TF_VAR_api_token_salt: ${{ secrets.API_TOKEN_SALT }}
-          # TF_VAR_admin_jwt_secret: ${{ secrets.ADMIN_JWT_SECRET }}
-          # TF_VAR_transfer_token_salt: ${{ secrets.TRANSFER_TOKEN_SALT }}
-          # TF_VAR_encryption_key: ${{ secrets.ENCRYPTION_KEY }}
-          # TF_VAR_jwt_secret: ${{ secrets.JWT_SECRET }}
+          TF_VAR_image_url: ${{ secrets.ECR_REPO }}:latest
         run: terraform destroy -auto-approve
 
 # name: Destroy Infrastructure
