@@ -17,7 +17,8 @@ public_subnets = [
 
 # Private subnets (for ECS Fargate)
 private_subnets = [
-  "subnet-0998fb4a06c08c104"
+  "subnet-0998fb4a06c08c104",
+  "subnet-0d88c3d1d96a14fcf"
 ]
 
 
