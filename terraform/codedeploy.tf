@@ -16,6 +16,8 @@ resource "aws_codedeploy_deployment_group" "dg" {
   deployment_group_name = "${var.project_name}-dg"
   service_role_arn      = aws_iam_role.codedeploy_role.arn
 
+  deployment_config_name = "CodeDeployDefault.ECSAllAtOnce"
+
   deployment_style {
     deployment_type   = "BLUE_GREEN"
     deployment_option = "WITH_TRAFFIC_CONTROL"
