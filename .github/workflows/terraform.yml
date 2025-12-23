@@ -47,7 +47,10 @@ jobs:
         working-directory: terraform
         run: |
           terraform apply -auto-approve \
-            -var="image_url=${{ secrets.ECR_REPO }}:latest"
+            -var="image_url=${{ secrets.ECR_REPO }}:latest" \
+            -var="db_name=${{ secrets.DB_NAME }}" \
+            -var="db_user=${{ secrets.DB_USER }}" \
+            -var="db_password=${{ secrets.DB_PASSWORD }}"
 
 
 # name: CD – Deploy Strapi to ECS
