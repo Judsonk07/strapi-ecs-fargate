@@ -6,6 +6,21 @@
 # encryption_key = "changeme"
 
 
+# Existing VPC
+vpc_id = "vpc-0a3f0628492e39abf"
+
+# Public subnets (for ALB)
+public_subnets = [
+  "subnet-08c877940b031d6ed",
+  "subnet-0d88c3d1d96a14fcf"
+]
+
+# Private subnets (for ECS Fargate)
+private_subnets = [
+  "subnet-0998fb4a06c08c104"
+]
+
+
 app_keys="gic/fVUC56QogygkLhAvyA==,uqUsnTf6/5f2rn69M5m/nA==,xKYXb5D/uBo8Ao1Fuu2AOg==,fjAOqRL3sNoPPwwmGZjbxQ=="
 api_token_salt="Qew12hM1eRXBkdyJPvMaSA=="
 admin_jwt_secret="6p8NqtxvXL9GDilJg5gSwg=="
