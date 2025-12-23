@@ -93,7 +93,7 @@ resource "aws_cloudwatch_metric_alarm" "alb_latency_high" {
   threshold           = 2
 
   dimensions = {
-    LoadBalancer = aws_lb.this.arn_suffix
+    LoadBalancer = aws_lb.alb.arn_suffix
   }
 
   alarm_description = "High response latency on Strapi ALB"
@@ -114,8 +114,8 @@ resource "aws_cloudwatch_metric_alarm" "alb_unhealthy_targets" {
   threshold           = 0
 
   dimensions = {
-    LoadBalancer = aws_lb.this.arn_suffix
-    TargetGroup  = aws_lb_target_group.this.arn_suffix
+    LoadBalancer = aws_lb.alb.arn_suffix
+    TargetGroup  = aws_lb_target_group.blue.arn_suffix
   }
 
   alarm_description = "Strapi ALB target is unhealthy"

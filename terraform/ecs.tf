@@ -1,11 +1,25 @@
+##################################
+# ECS Cluster
+##################################
+
 resource "aws_ecs_cluster" "this" {
   name = "strapi-cluster"
 }
 
 resource "aws_ecs_cluster_capacity_providers" "this" {
   cluster_name = aws_ecs_cluster.this.name
+
+  capacity_providers = ["FARGATE"]
+
+  default_capacity_provider_strategy {
+    capacity_provider = "FARGATE"
+    weight            = 1
+  }
 }
 
+##################################
+# ECS Task Definition
+##################################
 
 resource "aws_ecs_task_definition" "this" {
   family                   = "strapi-task"
@@ -13,9 +27,9 @@ resource "aws_ecs_task_definition" "this" {
   network_mode             = "awsvpc"
   cpu                      = "512"
   memory                   = "1024"
-  execution_role_arn       = data.aws_iam_role.ecs_task_execution_role.arn
-  task_role_arn            = data.aws_iam_role.ecs_task_execution_role.arn
 
+  execution_role_arn = data.aws_iam_role.ecs_task_execution_role.arn
+  task_role_arn      = data.aws_iam_role.ecs_task_execution_role.arn
 
   container_definitions = jsonencode([
     {
@@ -23,10 +37,12 @@ resource "aws_ecs_task_definition" "this" {
       image     = var.image_url
       essential = true
 
-      portMappings = [{
-        containerPort = 1337
-        protocol      = "tcp"
-      }]
+      portMappings = [
+        {
+          containerPort = 1337
+          protocol      = "tcp"
+        }
+      ]
 
       logConfiguration = {
         logDriver = "awslogs"
@@ -56,40 +72,41 @@ resource "aws_ecs_task_definition" "this" {
         { name = "ENCRYPTION_KEY", value = var.encryption_key },
         { name = "JWT_SECRET", value = var.jwt_secret }
       ]
-
-      # secrets = [
-      #   { name = "APP_KEYS", valueFrom = "${aws_secretsmanager_secret.strapi.arn}:APP_KEYS::" },
-      #   { name = "API_TOKEN_SALT", valueFrom = "${aws_secretsmanager_secret.strapi.arn}:API_TOKEN_SALT::" },
-      #   { name = "ADMIN_JWT_SECRET", valueFrom = "${aws_secretsmanager_secret.strapi.arn}:ADMIN_JWT_SECRET::" },
-      #   { name = "TRANSFER_TOKEN_SALT", valueFrom = "${aws_secretsmanager_secret.strapi.arn}:TRANSFER_TOKEN_SALT::" },
-      #   { name = "ENCRYPTION_KEY", valueFrom = "${aws_secretsmanager_secret.strapi.arn}:ENCRYPTION_KEY::" }
-      # ]
     }
   ])
 }
+
+##################################
+# ECS Service (Blue/Green via CodeDeploy)
+##################################
 
 resource "aws_ecs_service" "this" {
   name            = "strapi-service"
   cluster         = aws_ecs_cluster.this.id
   task_definition = aws_ecs_task_definition.this.arn
   desired_count   = 1
-  launch_type = "FARGATE"
+  launch_type     = "FARGATE"
+
+  enable_execute_command = true
 
   deployment_controller {
     type = "CODE_DEPLOY"
   }
 
   network_configuration {
-    subnets          = data.aws_subnets.default.ids
-    security_groups  = [aws_security_group.strapi.id]
-    assign_public_ip = true
+    subnets         = var.private_subnets
+    security_groups = [aws_security_group.strapi.id]
+    assign_public_ip = false
   }
 
   load_balancer {
-    target_group_arn = aws_lb_target_group.this.arn
+    target_group_arn = aws_lb_target_group.blue.arn
     container_name   = "strapi"
     container_port   = 1337
   }
 
-  depends_on = [aws_lb_listener.this, aws_ecs_cluster_capacity_providers.this]
+  depends_on = [
+    aws_lb_listener.http,
+    aws_ecs_cluster_capacity_providers.this
+  ]
 }
