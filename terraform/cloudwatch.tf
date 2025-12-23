@@ -165,7 +165,7 @@ resource "aws_cloudwatch_dashboard" "strapi_dashboard" {
         height = 6
         properties = {
           metrics = [
-            ["AWS/ApplicationELB", "TargetResponseTime", "LoadBalancer", aws_lb.this.arn_suffix]
+            ["AWS/ApplicationELB", "TargetResponseTime", "LoadBalancer", aws_lb.alb.arn_suffix]
           ]
           period = 60
           stat   = "Average"
