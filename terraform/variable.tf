@@ -3,6 +3,19 @@ variable "aws_region" {
   default = "ap-southeast-1"
 }
 
+variable "project_name" {
+  default = "strapi-bg"
+}
+
+variable "vpc_id" {}
+variable "public_subnets" {
+  type = list(string)
+}
+
+variable "private_subnets" {
+  type = list(string)
+}
+
 variable "image_url" {
   type = string
 }
