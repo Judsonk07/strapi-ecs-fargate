@@ -17,7 +17,7 @@ resource "aws_iam_role_policy_attachment" "ecs_policy" {
 }
 
 resource "aws_iam_role" "codedeploy_role" {
-  name = "CodeDeployECSRole"
+  name = "CodeDeployECSRole-judson"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"

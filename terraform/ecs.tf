@@ -9,12 +9,12 @@ resource "aws_ecs_cluster" "this" {
 resource "aws_ecs_cluster_capacity_providers" "this" {
   cluster_name = aws_ecs_cluster.this.name
 
-  capacity_providers = ["FARGATE"]
+  # capacity_providers = ["FARGATE"]
 
-  default_capacity_provider_strategy {
-    capacity_provider = "FARGATE"
-    weight            = 1
-  }
+  # default_capacity_provider_strategy {
+  #   capacity_provider = "FARGATE"
+  #   weight            = 1
+  # }
 }
 
 ##################################
@@ -29,7 +29,7 @@ resource "aws_ecs_task_definition" "this" {
   memory                   = "1024"
 
   execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
-  task_role_arn      = aws_iam_role.ecs_task_execution_role.arn
+  # task_role_arn      = aws_iam_role.ecs_task_execution_role.arn
 
   container_definitions = jsonencode([
     {
@@ -44,14 +44,14 @@ resource "aws_ecs_task_definition" "this" {
         }
       ]
 
-      logConfiguration = {
-        logDriver = "awslogs"
-        options = {
-          awslogs-group         = aws_cloudwatch_log_group.strapi.name
-          awslogs-region        = var.aws_region
-          awslogs-stream-prefix = "ecs"
-        }
-      }
+      # logConfiguration = {
+      #   logDriver = "awslogs"
+      #   options = {
+      #     awslogs-group         = aws_cloudwatch_log_group.strapi.name
+      #     awslogs-region        = var.aws_region
+      #     awslogs-stream-prefix = "ecs"
+      #   }
+      # }
 
       environment = [
         { name = "HOST", value = "0.0.0.0" },
@@ -107,6 +107,6 @@ resource "aws_ecs_service" "this" {
 
   depends_on = [
     aws_lb_listener.http,
-    aws_ecs_cluster_capacity_providers.this
+    # aws_ecs_cluster_capacity_providers.this
   ]
 }
