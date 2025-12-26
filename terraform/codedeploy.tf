@@ -16,7 +16,6 @@ resource "aws_codedeploy_deployment_group" "dg" {
   }
 
   blue_green_deployment_config {
-
     deployment_ready_option {
       action_on_timeout    = "CONTINUE_DEPLOYMENT"
       wait_time_in_minutes = 0
@@ -47,10 +46,6 @@ resource "aws_codedeploy_deployment_group" "dg" {
       prod_traffic_route {
         listener_arns = [aws_lb_listener.http.arn]
       }
-
-      test_traffic_route {
-        listener_arns = [aws_lb_listener.http.arn]
-      }
     }
   }
 
@@ -59,6 +54,7 @@ resource "aws_codedeploy_deployment_group" "dg" {
     events  = ["DEPLOYMENT_FAILURE"]
   }
 }
+
 
 
 # resource "aws_codedeploy_app" "this" {
