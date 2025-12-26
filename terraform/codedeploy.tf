@@ -5,7 +5,7 @@ resource "aws_codedeploy_app" "this" {
 
 resource "aws_codedeploy_deployment_group" "dg" {
   app_name              = aws_codedeploy_app.this.name
-  deployment_group_name = "strapi-bg-dg"
+  deployment_group_name = "${var.project_name}-dg"
   service_role_arn      = aws_iam_role.codedeploy_role.arn
 
   deployment_config_name = "CodeDeployDefault.ECSAllAtOnce"
@@ -43,12 +43,14 @@ resource "aws_codedeploy_deployment_group" "dg" {
         name = aws_lb_target_group.green.name
       }
 
+      # ✅ PROD → PORT 80
       prod_traffic_route {
         listener_arns = [aws_lb_listener.http.arn]
       }
 
+      # ✅ TEST → PORT 9000 (MUST BE DIFFERENT)
       test_traffic_route {
-        listener_arns = [aws_lb_listener.http.arn]
+        listener_arns = [aws_lb_listener.test.arn]
       }
     }
   }
@@ -58,6 +60,7 @@ resource "aws_codedeploy_deployment_group" "dg" {
     events  = ["DEPLOYMENT_FAILURE"]
   }
 }
+
 
 
 
