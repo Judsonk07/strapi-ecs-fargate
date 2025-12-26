@@ -13,12 +13,12 @@ resource "aws_lb_target_group" "blue" {
   target_type = "ip"
 
   health_check {
-    path                = "/_health"
+    path                = "/admin"
     matcher             = "200-399"
     interval            = 30
     timeout             = 5
     healthy_threshold   = 2
-    unhealthy_threshold = 5
+    unhealthy_threshold = 3
   }
 }
 
@@ -30,12 +30,12 @@ resource "aws_lb_target_group" "green" {
   target_type = "ip"
 
   health_check {
-    path                = "/_health"
+    path                = "/admin"
     matcher             = "200-399"
     interval            = 30
     timeout             = 5
     healthy_threshold   = 2
-    unhealthy_threshold = 5
+    unhealthy_threshold = 3
   }
 }
 
@@ -49,6 +49,7 @@ resource "aws_lb_listener" "http" {
     target_group_arn = aws_lb_target_group.blue.arn
   }
 }
+
 
 
 
