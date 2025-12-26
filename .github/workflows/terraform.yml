@@ -34,6 +34,15 @@ jobs:
             -var="db_name=${{ secrets.DB_NAME }}" \
             -var="db_user=${{ secrets.DB_USER }}" \
             -var="db_password=${{ secrets.DB_PASSWORD }}"
+
+        # 🔥 THIS IS THE MISSING STEP 🔥
+      - name: Trigger CodeDeploy Blue-Green Deployment
+        run: |
+          aws deploy create-deployment \
+            --application-name strapi-bg-codedeploy-app \
+            --deployment-group-name strapi-bg-dg \
+            --revision revisionType=AppSpecContent,appSpecContent="{content=$(base64 -w 0 appspec.yml)}" \
+            --region ap-southeast-1    
   
 
 

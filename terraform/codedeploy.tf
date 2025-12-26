@@ -46,6 +46,10 @@ resource "aws_codedeploy_deployment_group" "dg" {
       prod_traffic_route {
         listener_arns = [aws_lb_listener.http.arn]
       }
+
+      test_traffic_route {
+        listener_arns = [aws_lb_listener.http.arn]
+      }
     }
   }
 
