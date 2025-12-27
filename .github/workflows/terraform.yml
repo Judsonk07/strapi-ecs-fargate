@@ -38,10 +38,16 @@ jobs:
         # 🔥 THIS IS THE MISSING STEP 🔥
       - name: Trigger CodeDeploy Blue-Green Deployment
         run: |
+          TASK_DEF=$(aws ecs list-task-definitions \
+            --family-prefix strapi-bg-task \
+            --sort DESC \
+            --query 'taskDefinitionArns[0]' \
+            --output text)
+
           aws deploy create-deployment \
             --application-name strapi-bg-codedeploy-app \
             --deployment-group-name strapi-bg-dg \
-            --revision revisionType=AppSpecContent,appSpecContent="{content=$(base64 -w 0 appspec.yml)}" \
+            --revision "revisionType=AppSpecContent,appSpecContent={content=$(sed 's/\"/\\\"/g' appspec.yml)}" \
             --region ap-southeast-1    
   
 

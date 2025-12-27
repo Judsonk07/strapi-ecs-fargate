@@ -73,7 +73,7 @@ resource "aws_ecs_service" "this" {
     type = "CODE_DEPLOY"
   }
 
-  health_check_grace_period_seconds = 180
+  health_check_grace_period_seconds = 300
 
   network_configuration {
     subnets         = var.private_subnets
@@ -88,6 +88,7 @@ resource "aws_ecs_service" "this" {
   }
   depends_on = [
     aws_lb_listener.http,
+    aws_lb_listener.test
   ]
 }
 
