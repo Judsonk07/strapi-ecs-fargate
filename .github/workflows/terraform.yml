@@ -1,18 +1,18 @@
 name: CD - ECS Blue Green Deployment
 
 on:
-  # ✅ Automatic trigger after CI success
+  # Automatic trigger after CI success
   workflow_run:
     workflows: ["CI - Build & Push Strapi Image"]
     types:
       - completed
 
-  # ✅ Manual trigger
+  # Manual trigger
   workflow_dispatch:
 
 jobs:
   deploy:
-    # 🔒 Prevent CD from running if CI failed
+    # Prevent CD from running if CI failed
     if: |
       github.event_name == 'workflow_dispatch' ||
       github.event.workflow_run.conclusion == 'success'
@@ -29,9 +29,15 @@ jobs:
       CODEDEPLOY_DEPLOYMENT_GROUP: strapi-codedeploy-dg
 
     steps:
+      # -------------------------------
+      # Checkout Repo
+      # -------------------------------
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # -------------------------------
+      # Configure AWS Credentials
+      # -------------------------------
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -39,6 +45,9 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
+      # -------------------------------
+      # Get Current Task Definition
+      # -------------------------------
       - name: Get current task definition
         run: |
           aws ecs describe-services \
@@ -47,6 +56,9 @@ jobs:
             --query "services[0].taskDefinition" \
             --output text
 
+      # -------------------------------
+      # Register New Task Definition
+      # -------------------------------
       - name: Register new task definition
         id: task-def
         run: |
@@ -57,6 +69,9 @@ jobs:
 
           echo "task_def_arn=$NEW_TASK_DEF_ARN" >> $GITHUB_OUTPUT
 
+      # -------------------------------
+      # Create AppSpec JSON
+      # -------------------------------
       - name: Create AppSpec
         run: |
           cat > appspec.json << EOF
@@ -79,29 +94,33 @@ jobs:
           }
           EOF
 
-      - name: Escape AppSpec JSON
-        id: appspec
-        run: |
-          APPSPEC_CONTENT=$(cat appspec.json | jq -c . | sed 's/"/\\"/g')
-          echo "content=$APPSPEC_CONTENT" >> $GITHUB_OUTPUT
-
+      # -------------------------------
+      # Trigger CodeDeploy Deployment
+      # -------------------------------
       - name: Deploy via CodeDeploy
         id: deploy
         run: |
           DEPLOYMENT_ID=$(aws deploy create-deployment \
             --application-name $CODEDEPLOY_APPLICATION \
             --deployment-group-name $CODEDEPLOY_DEPLOYMENT_GROUP \
-            --revision "{\"revisionType\":\"AppSpecContent\",\"appSpecContent\":{\"content\":\"${{ steps.appspec.outputs.content }}\"}}" \
+            --revision "revisionType=AppSpecContent,appSpecContent={file://appspec.json}" \
+            --description "GitHub Actions ECS Blue-Green Deployment" \
             --query "deploymentId" \
             --output text)
 
           echo "deployment_id=$DEPLOYMENT_ID" >> $GITHUB_OUTPUT
+          echo "🚀 Deployment ID: $DEPLOYMENT_ID"
 
+      # -------------------------------
+      # Deployment Summary
+      # -------------------------------
       - name: Deployment Summary
         run: |
           echo "## 🚀 ECS Blue-Green Deployment Started" >> $GITHUB_STEP_SUMMARY
           echo "- Deployment ID: ${{ steps.deploy.outputs.deployment_id }}" >> $GITHUB_STEP_SUMMARY
-
+          echo "- Cluster: $ECS_CLUSTER" >> $GITHUB_STEP_SUMMARY
+          echo "- Service: $ECS_SERVICE" >> $GITHUB_STEP_SUMMARY
+          echo "- Region: $AWS_REGION" >> $GITHUB_STEP_SUMMARY
 
 
 
