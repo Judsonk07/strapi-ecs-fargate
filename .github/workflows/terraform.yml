@@ -1,15 +1,17 @@
 name: CD - ECS Blue Green Deployment
 
 on:
-  workflow_dispatch:
+  workflow_run:
+    workflows: ["CI - Build & Push Strapi Image"]
+    types:
+      - completed
 
 jobs:
   deploy:
-    name: Deploy to ECS via CodeDeploy
     runs-on: ubuntu-latest
 
     env:
-      AWS_REGION: ap-south-1
+      AWS_REGION: ap-southeast-1
       ECS_CLUSTER: strapi-cluster
       ECS_SERVICE: strapi-service
       CONTAINER_NAME: strapi
