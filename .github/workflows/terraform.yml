@@ -109,7 +109,7 @@ jobs:
           --description "GitHub Actions ECS Blue-Green Deployment" \
           --query "deploymentId" \
           --output text)
-          echo "🚀 Deployment ID: $DEPLOYMENT_ID
+          echo "🚀 Deployment ID: $DEPLOYMENT_ID"
 
 
 
