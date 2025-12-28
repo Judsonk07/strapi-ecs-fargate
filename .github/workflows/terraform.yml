@@ -79,32 +79,49 @@ jobs:
             --query 'services[0].taskDefinition' \
             --output text)
           
-          cat > appspec.yml << EOF
-          version: 1
-          Resources:
-            - TargetService:
-                Type: AWS::ECS::Service
-                Properties:
-                  TaskDefinition: "$TASK_DEFINITION"
-                  LoadBalancerInfo:
-                    ContainerName: $CONTAINER_NAME
-                    ContainerPort: $CONTAINER_PORT
-          Hooks:
-            - BeforeAllowTraffic: ""
-            - AfterAllowTraffic: ""
+          cat > appspec.json << 'EOF'
+          {
+            "version": 1,
+            "Resources": [
+              {
+                "TargetService": {
+                  "Type": "AWS::ECS::Service",
+                  "Properties": {
+                    "TaskDefinition": "TASK_DEF_PLACEHOLDER",
+                    "LoadBalancerInfo": {
+                      "ContainerName": "strapi",
+                      "ContainerPort": 1337
+                    }
+                  }
+                }
+              }
+            ],
+            "Hooks": [
+              {
+                "BeforeAllowTraffic": ""
+              },
+              {
+                "AfterAllowTraffic": ""
+              }
+            ]
+          }
           EOF
+          
+          # Replace placeholder with actual task definition
+          sed -i "s|TASK_DEF_PLACEHOLDER|$TASK_DEFINITION|g" appspec.json
 
       # -------------------------------
       # Trigger CodeDeploy Blue-Green
       # -------------------------------
       - name: Deploy via CodeDeploy
         run: |
-          APPSPEC_CONTENT=$(cat appspec.yml | sed 's/"/\\"/g' | tr '\n' ' ')
+          # Read and validate JSON
+          APPSPEC_CONTENT=$(cat appspec.json | jq -c .)
           
           DEPLOYMENT_ID=$(aws deploy create-deployment \
           --application-name $CODEDEPLOY_APPLICATION \
           --deployment-group-name $CODEDEPLOY_DEPLOYMENT_GROUP \
-          --revision "revisionType=AppSpecContent,appSpecContent={content=\"$APPSPEC_CONTENT\"}" \
+          --revision "revisionType=AppSpecContent,appSpecContent={content='$APPSPEC_CONTENT'}" \
           --description "GitHub Actions ECS Blue-Green Deployment" \
           --query "deploymentId" \
           --output text)

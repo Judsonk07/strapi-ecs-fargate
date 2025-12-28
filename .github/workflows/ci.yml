@@ -25,7 +25,10 @@ jobs:
         run: |
           docker build -t strapi .
           docker tag strapi:latest ${{ secrets.ECR_REPO }}:${{ github.sha }}
+          docker tag strapi:latest ${{ secrets.ECR_REPO }}:latest
           docker push ${{ secrets.ECR_REPO }}:${{ github.sha }}
+          docker push ${{ secrets.ECR_REPO }}:latest
+          echo "✅ Docker image pushed successfully"
 
 
 
