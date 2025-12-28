@@ -69,3 +69,15 @@ variable "jwt_secret" {
   type        = string
   sensitive   = true
 }
+
+variable "acm_certificate_arn" {
+  description = "(Optional) ARN of an ACM certificate to enable HTTPS on the ALB. Leave empty to skip HTTPS listener."
+  type        = string
+  default     = ""
+}
+
+variable "enable_test_listener_ingress" {
+  description = "Enable external ingress to ALB test listener (port 9000). Set to true to allow 0.0.0.0/0 access."
+  type        = bool
+  default     = false
+}

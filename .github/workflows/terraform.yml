@@ -50,23 +50,10 @@ jobs:
           terraform_version: 1.7.0
 
       # -------------------------------
-      # Terraform Init
+      # Install tools needed by workflow
       # -------------------------------
-      - name: Terraform Init
-        working-directory: terraform
-        run: terraform init
-
-      # -------------------------------
-      # Terraform Apply (AUTO CREATE EVERYTHING)
-      # -------------------------------
-      - name: Terraform Apply
-        working-directory: terraform
-        run: |
-          terraform apply -auto-approve \
-            -var="image_url=${{ secrets.ECR_REPO }}:${{ github.sha }}" \
-            -var="db_name=${{ secrets.DB_NAME }}" \
-            -var="db_user=${{ secrets.DB_USER }}" \
-            -var="db_password=${{ secrets.DB_PASSWORD }}"
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
 
       # -------------------------------
       # Create AppSpec
@@ -78,9 +65,29 @@ jobs:
             --services $ECS_SERVICE \
             --query 'services[0].taskDefinition' \
             --output text)
-          
+
           cat > appspec.json << 'EOF'
           {
+            "version": 1,
+            "Resources": [
+              {
+                "TargetService": {
+                  "Type": "AWS::ECS::Service",
+                  "Properties": {
+                    "TaskDefinition": "TASK_DEF_PLACEHOLDER",
+                    "LoadBalancerInfo": {
+                      "ContainerName": "strapi",
+                      "ContainerPort": 1337
+                    }
+                  }
+                }
+              }
+            ]
+          }
+          EOF
+
+          # Replace placeholder with actual task definition
+          sed -i "s|TASK_DEF_PLACEHOLDER|$TASK_DEFINITION|g" appspec.json
             "version": 1,
             "Resources": [
               {

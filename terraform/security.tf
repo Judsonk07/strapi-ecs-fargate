@@ -20,6 +20,7 @@ resource "aws_security_group" "alb_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+
   egress {
     from_port   = 0
     to_port     = 0
@@ -72,6 +73,18 @@ resource "aws_security_group" "rds_sg" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+}
+
+
+# Conditional security group rule for ALB test listener (port 9000)
+resource "aws_security_group_rule" "alb_test_ingress" {
+  count            = var.enable_test_listener_ingress ? 1 : 0
+  type             = "ingress"
+  from_port        = 9000
+  to_port          = 9000
+  protocol         = "tcp"
+  cidr_blocks      = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.alb_sg.id
 }
 
 

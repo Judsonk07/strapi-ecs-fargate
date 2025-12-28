@@ -32,3 +32,18 @@ output "codedeploy_app_name" {
   value       = aws_codedeploy_app.this.name
   description = "CodeDeploy application name"
 }
+
+output "codedeploy_deployment_group" {
+  value       = aws_codedeploy_deployment_group.dg.deployment_group_name
+  description = "CodeDeploy Deployment Group name"
+}
+
+output "alb_listener_http_arn" {
+  value       = aws_lb_listener.http.arn
+  description = "ARN for ALB HTTP listener"
+}
+
+output "alb_listener_https_arn" {
+  value       = length(aws_lb_listener.https) > 0 ? aws_lb_listener.https[0].arn : ""
+  description = "ARN for ALB HTTPS listener (empty if no certificate provided)"
+}
