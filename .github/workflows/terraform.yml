@@ -60,71 +60,56 @@ jobs:
       # -------------------------------
       - name: Create AppSpec
         run: |
+          set -euo pipefail
+
           TASK_DEFINITION=$(aws ecs describe-services \
-            --cluster $ECS_CLUSTER \
-            --services $ECS_SERVICE \
+            --cluster "$ECS_CLUSTER" \
+            --services "$ECS_SERVICE" \
             --query 'services[0].taskDefinition' \
             --output text)
 
-          cat > appspec.json << 'EOF'
-          {
-            "version": 1,
-            "Resources": [
-              {
-                "TargetService": {
-                  "Type": "AWS::ECS::Service",
-                  "Properties": {
-                    "TaskDefinition": "TASK_DEF_PLACEHOLDER",
-                    "LoadBalancerInfo": {
-                      "ContainerName": "strapi",
-                      "ContainerPort": 1337
-                    }
-                  }
-                }
-              }
-            ]
-          }
-          EOF
-
-          # Replace placeholder with actual task definition
-          sed -i "s|TASK_DEF_PLACEHOLDER|$TASK_DEFINITION|g" appspec.json
-            "version": 1,
-            "Resources": [
-              {
-                "TargetService": {
-                  "Type": "AWS::ECS::Service",
-                  "Properties": {
-                    "TaskDefinition": "TASK_DEF_PLACEHOLDER",
-                    "LoadBalancerInfo": {
-                      "ContainerName": "strapi",
-                      "ContainerPort": 1337
-                    }
-                  }
-                }
-              }
-            ]
-          }
-          EOF
-          
-          # Replace placeholder with actual task definition
-          sed -i "s|TASK_DEF_PLACEHOLDER|$TASK_DEFINITION|g" appspec.json
+          # Build appspec.json programmatically with jq to avoid heredoc/indentation issues
+          jq -n \
+            --arg td "$TASK_DEFINITION" \
+            --arg cn "$CONTAINER_NAME" \
+            --arg cp "$CONTAINER_PORT" \
+            '{version:1, Resources:[{TargetService:{Type:"AWS::ECS::Service",Properties:{TaskDefinition:$td,LoadBalancerInfo:{ContainerName:$cn,ContainerPort:($cp|tonumber)}}}}]}' \
+            > appspec.json
 
       # -------------------------------
       # Trigger CodeDeploy Blue-Green
       # -------------------------------
       - name: Deploy via CodeDeploy
+        id: deploy
         run: |
-          # Read and validate JSON
-          APPSPEC_CONTENT=$(cat appspec.json | jq -c .)
-          
+          set -euo pipefail
+
+          # Produce a safely-escaped JSON string of appspec.json
+          APPSPEC_ESCAPED=$(jq -Rs . appspec.json)
+
+          # Build a revision file that the AWS CLI can accept with file://
+          cat > revision.json <<EOF
+          {
+            "revisionType": "AppSpecContent",
+            "appSpecContent": {
+            "content": $APPSPEC_ESCAPED
+            }
+          }
+          EOF
+
           DEPLOYMENT_ID=$(aws deploy create-deployment \
-          --application-name $CODEDEPLOY_APPLICATION \
-          --deployment-group-name $CODEDEPLOY_DEPLOYMENT_GROUP \
-          --revision "revisionType=AppSpecContent,appSpecContent={content='$APPSPEC_CONTENT'}" \
-          --description "GitHub Actions ECS Blue-Green Deployment" \
-          --query "deploymentId" \
-          --output text)
+            --application-name "$CODEDEPLOY_APPLICATION" \
+            --deployment-group-name "$CODEDEPLOY_DEPLOYMENT_GROUP" \
+            --revision file://revision.json \
+            --description "GitHub Actions ECS Blue-Green Deployment" \
+            --query "deploymentId" \
+            --output text)
+
           echo "🚀 Deployment ID: $DEPLOYMENT_ID"
+
+          # Export as a step output and print summary for the run
+          echo "deployment_id=$DEPLOYMENT_ID" >> $GITHUB_OUTPUT
+          echo "Deployment ID: $DEPLOYMENT_ID" >> $GITHUB_STEP_SUMMARY
 
 
 
