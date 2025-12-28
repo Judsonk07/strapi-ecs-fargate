@@ -23,11 +23,11 @@ resource "aws_ecs_task_definition" "this" {
       }]
 
       healthCheck = {
-        command     = ["CMD-SHELL", "curl -f http://localhost:1337/_health || exit 1"]
+        command     = ["CMD-SHELL", "curl -f http://localhost:1337 || exit 1"]
         interval    = 30
-        timeout     = 5
+        timeout     = 10
         retries     = 3
-        startPeriod = 60
+        startPeriod = 90
       }
 
       logConfiguration = {
@@ -73,7 +73,7 @@ resource "aws_ecs_service" "this" {
     type = "CODE_DEPLOY"
   }
 
-  health_check_grace_period_seconds = 300
+  health_check_grace_period_seconds = 360
 
   network_configuration {
     subnets         = var.private_subnets
