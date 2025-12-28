@@ -102,11 +102,27 @@ jobs:
       # -------------------------------
       - name: Deploy via CodeDeploy
         run: |
-          aws deploy create-deployment \
-            --application-name $CODEDEPLOY_APPLICATION \
-            --deployment-group-name $CODEDEPLOY_DEPLOYMENT_GROUP \
-            --revision "revisionType=AppSpecContent,appSpecContent={content=file://appspec.json}" \
-            --description "GitHub Actions ECS Blue-Green Deployment"
+          DEPLOYMENT_ID=$(aws deploy create-deployment \
+          --application-name $CODEDEPLOY_APPLICATION \
+          --deployment-group-name $CODEDEPLOY_DEPLOYMENT_GROUP \
+          --revision "revisionType=AppSpecContent,appSpecContent={content=$(sed 's/\"/\\\"/g' appspec.yml)}" \
+          --description "GitHub Actions ECS Blue-Green Deployment" \
+          --query "deploymentId" \
+          --output text)
+          echo "🚀 Deployment ID: $DEPLOYMENT_ID
+
+
+
+
+
+
+      # - name: Deploy via CodeDeploy
+      #   run: |
+      #     aws deploy create-deployment \
+      #       --application-name $CODEDEPLOY_APPLICATION \
+      #       --deployment-group-name $CODEDEPLOY_DEPLOYMENT_GROUP \
+      #       --revision "revisionType=AppSpecContent,appSpecContent={content=file://appspec.json}" \
+      #       --description "GitHub Actions ECS Blue-Green Deployment"
 
 
 
