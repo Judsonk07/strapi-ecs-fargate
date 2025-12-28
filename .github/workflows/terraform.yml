@@ -95,14 +95,6 @@ jobs:
                   }
                 }
               }
-            ],
-            "Hooks": [
-              {
-                "BeforeAllowTraffic": ""
-              },
-              {
-                "AfterAllowTraffic": ""
-              }
             ]
           }
           EOF
