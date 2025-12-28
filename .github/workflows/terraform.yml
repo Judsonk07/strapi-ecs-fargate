@@ -25,8 +25,8 @@ jobs:
       ECS_SERVICE: strapi-service
       CONTAINER_NAME: strapi
       CONTAINER_PORT: 1337
-      CODEDEPLOY_APPLICATION: strapi-codedeploy-app
-      CODEDEPLOY_DEPLOYMENT_GROUP: strapi-codedeploy-dg
+      CODEDEPLOY_APPLICATION: strapi-bg-codedeploy-app
+      CODEDEPLOY_DEPLOYMENT_GROUP: strapi-bg-dg
 
     steps:
       # -------------------------------
