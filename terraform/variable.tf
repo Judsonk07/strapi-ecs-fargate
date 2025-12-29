@@ -11,7 +11,7 @@ variable "instance_type" {
 variable "key_name" {
   description = "Name of the SSH key pair in AWS"
   type        = string
-  default     = "my-ec2-key" # CHANGE THIS to your actual Key Pair name
+  default     = "Strapi" # CHANGE THIS to your actual Key Pair name
 }
 
 variable "docker_image" {
