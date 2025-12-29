@@ -1,32 +1,22 @@
 FROM node:20-alpine
 
-WORKDIR /app
+# Set working directory
+WORKDIR /srv/app
 
-# Install curl for health checks
-RUN apk add --no-cache curl
-
-# Copy package files
+# Copy package.json and package-lock.json
 COPY package*.json ./
 
-# Install ALL dependencies (required for build)
+# Install dependencies
 RUN npm install --production
 
-# Copy app source
+# Copy the rest of the application code
 COPY . .
 
-# Build Strapi admin (REQUIRED)
+# Build the Strapi admin panel
 RUN npm run build
 
-# Runtime env
-ENV NODE_ENV=production
-ENV HOST=0.0.0.0
-ENV PORT=1337
-
+# Expose Strapi port
 EXPOSE 1337
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=90s --retries=3 \
-  CMD curl -f http://localhost:1337 || exit 1
-
 # Start Strapi
-CMD ["npm", "run" , "start"]
+CMD ["npm", "run", "start"]

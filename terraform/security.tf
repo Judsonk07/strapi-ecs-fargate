@@ -1,90 +1,30 @@
-##################################
-# ALB Security Group
-##################################
+resource "aws_security_group" "strapi_sg" {
+  name        = "strapi-security-group"
+  description = "Allow SSH and Strapi traffic"
 
-resource "aws_security_group" "alb_sg" {
-  name   = "${var.project_name}-alb-sg"
-  vpc_id = var.vpc_id
-
+  # SSH
   ingress {
-    from_port   = 80
-    to_port     = 80
+    from_port   = 22
+    to_port     = 22
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  # Strapi
   ingress {
-    from_port   = 443
-    to_port     = 443
+    from_port   = 1337
+    to_port     = 1337
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-
+  # Outbound Internet (required for Docker pull)
   egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
-}
-
-##################################
-# ECS Security Group
-##################################
-
-resource "aws_security_group" "ecs_sg" {
-  name   = "${var.project_name}-ecs-sg"
-  vpc_id = var.vpc_id
-
-  ingress {
-    from_port       = 1337
-    to_port         = 1337
-    protocol        = "tcp"
-    security_groups = [aws_security_group.alb_sg.id]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
-##################################
-# RDS Security Group (NEW)
-##################################
-
-resource "aws_security_group" "rds_sg" {
-  name   = "${var.project_name}-rds-sg"
-  vpc_id = var.vpc_id
-
-  ingress {
-    from_port       = 5432
-    to_port         = 5432
-    protocol        = "tcp"
-    security_groups = [aws_security_group.ecs_sg.id]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
-
-# Conditional security group rule for ALB test listener (port 9000)
-resource "aws_security_group_rule" "alb_test_ingress" {
-  count            = var.enable_test_listener_ingress ? 1 : 0
-  type             = "ingress"
-  from_port        = 9000
-  to_port          = 9000
-  protocol         = "tcp"
-  cidr_blocks      = ["0.0.0.0/0"]
-  security_group_id = aws_security_group.alb_sg.id
 }
 
 

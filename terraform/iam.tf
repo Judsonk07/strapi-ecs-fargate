@@ -1,49 +1,27 @@
-resource "aws_iam_role" "ecs_task_execution_role" {
-  name = "ecsTaskExecutionRole-judson"
+# 1. Create IAM Role
+resource "aws_iam_role" "ec2_ecr_role" {
+  name = "strapi_ec2_ecr_role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
-      Effect = "Allow"
-      Principal = { Service = "ecs-tasks.amazonaws.com" }
       Action = "sts:AssumeRole"
+      Effect = "Allow"
+      Principal = {
+        Service = "ec2.amazonaws.com"
+      }
     }]
   })
 }
 
-resource "aws_iam_role_policy_attachment" "ecs_policy" {
-  role       = aws_iam_role.ecs_task_execution_role.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+# 2. Attach Policy to allow pulling from ECR
+resource "aws_iam_role_policy_attachment" "ecr_read_only" {
+  role       = aws_iam_role.ec2_ecr_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
 }
 
-# ECS Task Role (for application permissions inside the container)
-resource "aws_iam_role" "ecs_task_role" {
-  name = "ecsTaskRole-judson"
-
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Effect = "Allow"
-      Principal = { Service = "ecs-tasks.amazonaws.com" }
-      Action = "sts:AssumeRole"
-    }]
-  })
-}
-
-resource "aws_iam_role" "codedeploy_role" {
-  name = "CodeDeployECSRole-judson"
-
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Effect = "Allow"
-      Principal = { Service = "codedeploy.amazonaws.com" }
-      Action = "sts:AssumeRole"
-    }]
-  })
-}
-
-resource "aws_iam_role_policy_attachment" "codedeploy_policy" {
-  role       = aws_iam_role.codedeploy_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AWSCodeDeployRoleForECS"
+# 3. Create Instance Profile
+resource "aws_iam_instance_profile" "ec2_profile" {
+  name = "strapi_ec2_profile"
+  role = aws_iam_role.ec2_ecr_role.name
 }
