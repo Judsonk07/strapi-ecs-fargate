@@ -14,16 +14,17 @@ resource "aws_instance" "strapi_server" {
   key_name      = var.key_name
 
   vpc_security_group_ids = [aws_security_group.strapi_sg.id]
-  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.name
 
-  # User data script
-  user_data = templatefile("${path.module}/scripts/user_data.sh", {
+  # IAM Profile to allow ECR Pulls
+  iam_instance_profile = aws_iam_instance_profile.ec2_profile.name
+
+  # UPDATED: Path now points directly to user_data.sh in the same folder
+  user_data = templatefile("${path.module}/user_data.sh", {
     docker_image = var.docker_image
     docker_tag   = var.docker_tag
     aws_region   = var.aws_region
   })
 
-  # This forces a new instance if the Docker tag changes
   user_data_replace_on_change = true
 
   tags = {

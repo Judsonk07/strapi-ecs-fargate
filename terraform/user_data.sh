@@ -19,16 +19,16 @@ echo \
 sudo apt-get update
 sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
-# 2. Enable Docker
 sudo systemctl start docker
 sudo systemctl enable docker
 sudo usermod -aG docker ubuntu
 
-# 3. Log in to ECR using IAM Role
-echo "Logging in to ECR..."
+# 2. Log in to AWS ECR
+# We extract the registry ID from the full image path
+echo "Logging in to ECR in region ${aws_region}..."
 aws ecr get-login-password --region ${aws_region} | sudo docker login --username AWS --password-stdin $(echo ${docker_image} | cut -d'/' -f1)
 
-# 4. Pull and Run Strapi
+# 3. Pull and Run Strapi
 echo "Pulling image: ${docker_image}:${docker_tag}"
 sudo docker pull ${docker_image}:${docker_tag}
 
@@ -40,4 +40,4 @@ sudo docker run -d \
   -e NODE_ENV=production \
   ${docker_image}:${docker_tag}
 
-echo "Deployment complete."
+echo "Setup complete!"
