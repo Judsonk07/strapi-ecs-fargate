@@ -7,5 +7,3 @@ Resources:
         LoadBalancerInfo:
           ContainerName: strapi
           ContainerPort: 1337
-# If you need lifecycle Hooks, add them here with valid Lambda or SNS configuration.
-# Leaving Hooks out avoids CodeDeploy interpreting empty hook entries as missing Lambda names.

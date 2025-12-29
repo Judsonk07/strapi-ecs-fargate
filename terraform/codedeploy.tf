@@ -8,8 +8,7 @@ resource "aws_codedeploy_deployment_group" "dg" {
   deployment_group_name = "${var.project_name}-dg"
   service_role_arn      = aws_iam_role.codedeploy_role.arn
 
-  # Use Canary rollout: 10% traffic for 5 minutes, then shift remaining traffic
-  deployment_config_name = "CodeDeployDefault.ECSCanary10Percent5Minutes"
+  deployment_config_name = "CodeDeployDefault.ECSAllAtOnce"
 
   deployment_style {
     deployment_type   = "BLUE_GREEN"

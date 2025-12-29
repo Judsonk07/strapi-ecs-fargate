@@ -10,7 +10,7 @@ resource "aws_ecs_task_definition" "this" {
   memory                   = "2048"
 
   execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
-  task_role_arn      = aws_iam_role.ecs_task_role.arn
+  task_role_arn      = aws_iam_role.ecs_task_execution_role.arn
 
   container_definitions = jsonencode([
     {
@@ -78,7 +78,7 @@ resource "aws_ecs_service" "this" {
   network_configuration {
     subnets         = var.private_subnets
     security_groups = [aws_security_group.ecs_sg.id]
-    assign_public_ip = false
+    assign_public_ip = true
   }
 
   load_balancer {
