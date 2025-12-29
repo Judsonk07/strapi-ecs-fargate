@@ -1,5 +1,5 @@
 resource "aws_security_group" "strapi_sg" {
-  name        = "strapi-security-group"
+  name        = "strapi-security-group-judson"
   description = "Allow SSH and Strapi traffic"
 
   # SSH
