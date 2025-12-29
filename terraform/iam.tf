@@ -1,6 +1,6 @@
 # 1. Create IAM Role
 resource "aws_iam_role" "ec2_ecr_role" {
-  name = "strapi_ec2_ecr_role"
+  name = "strapi_ec2_ecr_role-judson"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
