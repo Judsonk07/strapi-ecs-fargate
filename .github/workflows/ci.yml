@@ -6,6 +6,8 @@ on:
 
 env:
   AWS_REGION: ap-southeast-1
+  # This secret MUST contain the FULL URI
+  # Example: 301782007642.dkr.ecr.ap-southeast-1.amazonaws.com/strapi-app
   ECR_REPOSITORY: ${{ secrets.ECR_REPO }}
 
 jobs:
@@ -31,13 +33,14 @@ jobs:
         with:
           context: .
           push: true
+          # UPDATED: We use the secret directly because it already contains the full link.
+          # We REMOVED the '${{ steps.login-ecr.outputs.registry }}/' prefix to avoid duplication.
           tags: |
-            ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:latest
-            ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+            ${{ env.ECR_REPOSITORY }}:latest
+            ${{ env.ECR_REPOSITORY }}:${{ github.sha }}
 
       - name: Image Digest
-        run: echo "Image pushed to ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}"
-
+        run: echo "Image pushed to ${{ env.ECR_REPOSITORY }}:${{ github.sha }}"
 
 
 # name: CI - Build & Push Strapi Image
