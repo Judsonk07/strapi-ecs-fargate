@@ -78,10 +78,10 @@ jobs:
             --services $ECS_SERVICE \
             --query 'services[0].taskDefinition' \
             --output text)
-          
+          # FIX: Version 0.0 and NO Hooks
           cat > appspec.json << 'EOF'
           {
-            "version": 1,
+            "version": 0.0,
             "Resources": [
               {
                 "TargetService": {
@@ -95,19 +95,9 @@ jobs:
                   }
                 }
               }
-            ],
-            "Hooks": [
-              {
-                "BeforeAllowTraffic": ""
-              },
-              {
-                "AfterAllowTraffic": ""
-              }
             ]
           }
           EOF
-          
-          # Replace placeholder with actual task definition
           sed -i "s|TASK_DEF_PLACEHOLDER|$TASK_DEFINITION|g" appspec.json
 
       # -------------------------------
