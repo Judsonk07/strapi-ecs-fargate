@@ -11,7 +11,6 @@ variable "instance_type" {
 variable "key_name" {
   description = "Name of the SSH key pair in AWS"
   type        = string
-  # UPDATED: This must match the name in AWS Console > EC2 > Key Pairs
   default     = "Strapi"
 }
 
@@ -26,7 +25,8 @@ variable "docker_tag" {
   default     = "latest"
 }
 
-# --- Strapi Secrets (Required for app to start) ---
+# --- Strapi Secrets ---
+# These names match your terraform.tfvars keys
 variable "app_keys" {
   description = "Strapi APP_KEYS"
   type        = string

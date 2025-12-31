@@ -33,6 +33,7 @@ sudo docker pull ${docker_image}:${docker_tag}
 
 echo "Running container..."
 # Passing Secrets as Environment Variables
+# These variables match the keys defined in the templatefile block in ec2.tf
 sudo docker run -d \
   --name strapi \
   --restart unless-stopped \

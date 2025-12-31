@@ -22,7 +22,7 @@ resource "aws_instance" "strapi_server" {
     docker_tag   = var.docker_tag
     aws_region   = var.aws_region
     
-    # Passing Strapi Secrets to the template
+    # Passing Strapi Secrets to the template using the variable names from variables.tf
     app_keys            = var.app_keys
     api_token_salt      = var.api_token_salt
     admin_jwt_secret    = var.admin_jwt_secret
