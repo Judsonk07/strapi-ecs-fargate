@@ -14,17 +14,24 @@ resource "aws_instance" "strapi_server" {
   key_name      = var.key_name
 
   vpc_security_group_ids = [aws_security_group.strapi_sg.id]
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.name
 
-  # IAM Profile to allow ECR Pulls
-  iam_instance_profile = aws_iam_instance_profile.ec2_profile.name
-
-  # UPDATED: Path now points directly to user_data.sh in the same folder
+  # Pass secrets and configuration to the user_data script
   user_data = templatefile("${path.module}/user_data.sh", {
     docker_image = var.docker_image
     docker_tag   = var.docker_tag
     aws_region   = var.aws_region
+    
+    # Passing Strapi Secrets to the template
+    app_keys            = var.app_keys
+    api_token_salt      = var.api_token_salt
+    admin_jwt_secret    = var.admin_jwt_secret
+    jwt_secret          = var.jwt_secret
+    transfer_token_salt = var.transfer_token_salt
+    encryption_key      = var.encryption_key
   })
 
+  # Forces replacement if user_data changes (ensures new secrets apply on re-deploy)
   user_data_replace_on_change = true
 
   tags = {

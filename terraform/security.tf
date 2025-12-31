@@ -1,6 +1,7 @@
 resource "aws_security_group" "strapi_sg" {
-  # CHANGED: Replaced hardcoded "judson" with random suffix
-  name        = "strapi_sg_${random_id.suffix.hex}" 
+  # UPDATED: Static name to avoid "random_id" changes forcing deletions
+  # This ensures the security group persists across deployments without conflicts
+  name        = "strapi-sg-production-v1"
   description = "Allow SSH and Strapi traffic"
 
   ingress {

@@ -24,7 +24,6 @@ sudo systemctl enable docker
 sudo usermod -aG docker ubuntu
 
 # 2. Log in to AWS ECR
-# We extract the registry ID from the full image path
 echo "Logging in to ECR in region ${aws_region}..."
 aws ecr get-login-password --region ${aws_region} | sudo docker login --username AWS --password-stdin $(echo ${docker_image} | cut -d'/' -f1)
 
@@ -33,11 +32,18 @@ echo "Pulling image: ${docker_image}:${docker_tag}"
 sudo docker pull ${docker_image}:${docker_tag}
 
 echo "Running container..."
+# Passing Secrets as Environment Variables
 sudo docker run -d \
   --name strapi \
   --restart unless-stopped \
   -p 1337:1337 \
-  -e NODE_ENV=production \
+  -e NODE_ENV=development \
+  -e APP_KEYS="${app_keys}" \
+  -e API_TOKEN_SALT="${api_token_salt}" \
+  -e ADMIN_JWT_SECRET="${admin_jwt_secret}" \
+  -e JWT_SECRET="${jwt_secret}" \
+  -e TRANSFER_TOKEN_SALT="${transfer_token_salt}" \
+  -e ENCRYPTION_KEY="${encryption_key}" \
   ${docker_image}:${docker_tag}
 
 echo "Setup complete!"
