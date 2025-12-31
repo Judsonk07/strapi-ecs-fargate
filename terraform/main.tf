@@ -4,16 +4,23 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 5.0"
     }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.0"
+    }
   }
 
-  # # CRITICAL: Create this bucket manually in AWS S3 before running
-  # backend "s3" {
-  #   bucket = "my-strapi-state-bucket" # CHANGE THIS to your bucket name
-  #   key    = "strapi/terraform.tfstate"
-  #   region = "us-east-1"
-  # }
+  backend "s3" {
+    bucket = "my-strapi-terraform-state-bucket"
+    key    = "strapi/terraform.tfstate"
+    region = "ap-southeast-1"
+  }
 }
 
 provider "aws" {
   region = var.aws_region
+}
+
+resource "random_id" "suffix" {
+  byte_length = 4
 }
