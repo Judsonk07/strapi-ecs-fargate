@@ -1,17 +1,18 @@
 variable "aws_region" {
   description = "AWS region"
-  default     = "us-east-1"
+  default     = "ap-southeast-1"
 }
 
 variable "instance_type" {
   description = "EC2 instance type"
-  default     = "t2.small" # Recommended for Strapi (needs ~2GB RAM)
+  default     = "t2.small"
 }
 
 variable "key_name" {
   description = "Name of the SSH key pair in AWS"
   type        = string
-  default     = "Strapi" # CHANGE THIS to your actual Key Pair name
+  # UPDATED: This must match the name in AWS Console > EC2 > Key Pairs
+  default     = "Strapi" 
 }
 
 variable "docker_image" {
