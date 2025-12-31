@@ -35,10 +35,21 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-southeast-1
 
-      # We need to login to ECR to get the registry URL format for Terraform variables
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
+      # --- NEW STEP: Auto-creates the S3 bucket if missing ---
+      - name: Ensure S3 State Bucket Exists
+        run: |
+          # Reads the bucket name directly from your main.tf file
+          BUCKET_NAME=$(grep 'bucket' main.tf | head -n 1 | awk -F '"' '{print $2}')
+          REGION="ap-southeast-1"
+          
+          echo "Checking S3 bucket: $BUCKET_NAME"
+          
+          if ! aws s3api head-bucket --bucket "$BUCKET_NAME" 2>/dev/null; then
+            echo "Bucket does not exist. Creating..."
+            aws s3api create-bucket --bucket "$BUCKET_NAME" --region "$REGION" --create-bucket-configuration LocationConstraint="$REGION"
+          else
+            echo "Bucket exists."
+          fi
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
@@ -52,7 +63,7 @@ jobs:
         if: ${{ inputs.terraform_action == 'apply' }}
         run: |
           terraform plan \
-            -var="docker_image=${{ steps.login-ecr.outputs.registry }}/strapi-app" \
+            -var="docker_image=${{ secrets.ECR_REPO }}" \
             -var="docker_tag=${{ inputs.image_tag }}" \
             -out=tfplan
 
@@ -64,7 +75,7 @@ jobs:
         if: ${{ inputs.terraform_action == 'destroy' }}
         run: |
           terraform destroy -auto-approve \
-            -var="docker_image=${{ steps.login-ecr.outputs.registry }}/strapi-app" \
+            -var="docker_image=${{ secrets.ECR_REPO }}" \
             -var="docker_tag=${{ inputs.image_tag }}"
 
 
