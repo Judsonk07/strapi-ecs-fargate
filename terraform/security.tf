@@ -1,8 +1,8 @@
 resource "aws_security_group" "strapi_sg" {
-  name        = "strapi-security-group-judson"
+  # CHANGED: Replaced hardcoded "judson" with random suffix
+  name        = "strapi_sg_${random_id.suffix.hex}" 
   description = "Allow SSH and Strapi traffic"
 
-  # SSH
   ingress {
     from_port   = 22
     to_port     = 22
@@ -10,7 +10,6 @@ resource "aws_security_group" "strapi_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  # Strapi
   ingress {
     from_port   = 1337
     to_port     = 1337
@@ -18,7 +17,6 @@ resource "aws_security_group" "strapi_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  # Outbound Internet (required for Docker pull)
   egress {
     from_port   = 0
     to_port     = 0
