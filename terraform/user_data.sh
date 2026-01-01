@@ -38,13 +38,18 @@ sudo docker run -d \
   --name strapi \
   --restart unless-stopped \
   -p 1337:1337 \
-  -e NODE_ENV=development \
+  -e NODE_ENV=production \
+  -e HOST=0.0.0.0 \
+  -e PORT=1337 \
   -e APP_KEYS="${app_keys}" \
   -e API_TOKEN_SALT="${api_token_salt}" \
   -e ADMIN_JWT_SECRET="${admin_jwt_secret}" \
   -e JWT_SECRET="${jwt_secret}" \
   -e TRANSFER_TOKEN_SALT="${transfer_token_salt}" \
   -e ENCRYPTION_KEY="${encryption_key}" \
+  -e DATABASE_CLIENT=sqlite \
+  -e DATABASE_FILENAME=/data/data.db \
+  -v strapi-data:/data \
   ${docker_image}:${docker_tag}
 
 echo "Setup complete!"
