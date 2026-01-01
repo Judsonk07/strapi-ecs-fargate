@@ -47,9 +47,6 @@ sudo docker run -d \
   -e JWT_SECRET="${jwt_secret}" \
   -e TRANSFER_TOKEN_SALT="${transfer_token_salt}" \
   -e ENCRYPTION_KEY="${encryption_key}" \
-  -e DATABASE_CLIENT=sqlite \
-  -e DATABASE_FILENAME=/data/data.db \
-  -v strapi-data:/data \
   ${docker_image}:${docker_tag}
 
 echo "Setup complete!"
